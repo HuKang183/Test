@@ -1,19 +1,19 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <!--[if IE]><![endif]-->
 <html>
   
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>&#20195;&#30721;&#31034;&#20363; </title>
+    <title>Table of Content </title>
     <meta name="viewport" content="width=device-width">
-    <meta name="title" content="&#20195;&#30721;&#31034;&#20363; ">
-    <meta name="generator" content="docfx 2.18.4.0">
+    <meta name="title" content="Table of Content ">
+    <meta name="generator" content="docfx ">
     
-    <link rel="shortcut icon" href="../favicon.ico">
-    <link rel="stylesheet" href="../styles/docfx.vendor.css">
-    <link rel="stylesheet" href="../styles/docfx.css">
-    <link rel="stylesheet" href="../styles/main.css">
+    <link rel="shortcut icon" href="../Test/favicon.ico">
+    <link rel="stylesheet" href="../Test/styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../Test/styles/docfx.css">
+    <link rel="stylesheet" href="../Test/styles/main.css">
     <meta property="docfx:navrel" content="">
     <meta property="docfx:tocrel" content="toc.html">
     
@@ -56,162 +56,292 @@
         </div>
       </header>
       <div role="main" class="container body-content hide-when-search">
-        
-        <div class="sidenav hide-when-search">
-          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
-          <div class="sidetoggle collapse" id="sidetoggle">
-            <div id="sidetoc"></div>
-          </div>
-        </div>
-        <div class="article row grid-right">
+        <div class="article row grid">
           <div class="col-md-10">
             <article class="content wrap" id="_content" data-uid="">
-
-<p>Linq 查询是数据层查询中最简单易用的查询，一般情况下，都推荐使用这种查询。  </p>
-<h2 id="代码示例">代码示例</h2>
-<pre><code class="lang-cs">[RepositoryQuery]
-public virtual WarehouseList GetByCode(string warehouseCode, string nameKeywords, PagingInfo pagingInfo)
-{
-    var q = this.CreateLinqQuery();
-
-    //条件对比
-    q = q.Where(e =&gt; e.Code == warehouseCode);
-    if (!string.IsNullOrEmpty(nameKeywords))
-    {
-        q = q.Where(e =&gt; e.Name.Contains(nameKeywords));
-    }
-
-    //排序
-    q = q.OrderByDescending(w =&gt; w.Name);
-
-    return (WarehouseList)this.QueryData(q, pagingInfo);//以指定的分页信息 pagingInfo 分页
-}
-</code></pre><p>上面的代码使用 Linq 查询实现了一个较复杂的查询示例。Linq 查询中可使用属性对比，排序，分页等。<br>
-PagingInfo 是 Rafy 中为分布设计的一个类型。详情见：<a href="\articles\Content\领域实体框架/实体仓库/编写查询/分页查询.html">分页查询</a></p>
-<h2 id="支持的操作符">支持的操作符</h2>
-<p>Rafy 并不支持所有的 Linq 标准查询。可以使用的 Linq 标准查询方法如下：</p>
-<table>
-<thead>
-<tr>
-<th>方法名</th>
-<th style="text-align:center">所属类型</th>
-<th style="text-align:right">备注</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Where</td>
-<td style="text-align:center">System.Linq.Queryable</td>
-<td style="text-align:right">添加 Where 条件约束</td>
-</tr>
-<tr>
-<td>OrderBy</td>
-<td style="text-align:center">System.Linq.Queryable</td>
-<td style="text-align:right">按照指定属性正序排列。</td>
-</tr>
-<tr>
-<td>OrderByDescending</td>
-<td style="text-align:center">System.Linq.Queryable</td>
-<td style="text-align:right">按照指定属性倒序排列。</td>
-</tr>
-<tr>
-<td>ThenBy</td>
-<td style="text-align:center">System.Linq.Queryable</td>
-<td style="text-align:right">再次，按照指定属性正序排列。</td>
-</tr>
-<tr>
-<td>ThenByDescending</td>
-<td style="text-align:center">System.Linq.Queryable</td>
-<td style="text-align:right">再次，按照指定属性倒序排列。</td>
-</tr>
-<tr>
-<td>Count</td>
-<td style="text-align:center">System.Linq.Queryable</td>
-<td style="text-align:right">直接返回 Linq 查询对应的行数。</td>
-</tr>
-</tbody>
-</table>
-<p>而 where 方法中，对实体的属性进行条件对比时：</p>
-<ul>
-<li>支持以下双目操作符：=、!=、&gt;、&gt;=、&lt;、&lt;=。                        </li>
-<li>支持单目操作符：!。                        </li>
-<li><p>支持两个属性条件间的连接条件：&amp;&amp;、||。例如：</p>
-<pre><code class="lang-cs">q = q.Where(e =&gt; e.Code == warehouseCode &amp;&amp; e.Name.Contains(nameKeywords) || e.Id &gt; 100);
-</code></pre></li>
-<li><p>支持引用查询。即间接使用引用实体的属性来进行查询。例如：</p>
-<pre><code class="lang-cs">q = q.Where(warehouse =&gt; warehouse.Administrator.Name == &quot;admin&quot;);
-</code></pre></li>
-</ul>
-<p>以上代码将会过滤出所有管理员名称是 &quot;admin&quot; 的仓库。<br>
-在生成 Sql 语句时，将会生成 INNER JOIN 语句，连接上这些被使用的引用实体对应的表。</p>
-<ul>
-<li>支持在属性对比条件中，使用以下方法对属性进行比较：</li>
-</ul>
-<p>方法名：Contains<br>
-所属类型：System.String<br>
-备注：判断指定属性是否包含指定字符串<br>
-示例：</p>
-<pre><code class="lang-cs">q = q.Where(e =&gt; e.Name.Contains(nameKeywords));
-</code></pre><p><br></p>
-<p>方法名：StartsWith<br>
-所属类型：System.String<br>
-备注：判断指定属性是否以指定字符串开头<br>
-示例：</p>
-<pre><code class="lang-cs">q = q.Where(e =&gt; e.Name.StartsWith(nameKeywords));
-</code></pre><p><br></p>
-<p>方法名：EndsWith<br>
-所属类型：System.String<br>
-备注：判断指定属性是否以指定字符串结尾<br>
-示例：</p>
-<pre><code class="lang-cs">q = q.Where(e =&gt; e.Name.EndsWith(nameKeywords));
-</code></pre><p><br></p>
-<p>方法名：IsNullOrEmpty<br>
-所属类型：System.String<br>
-备注：判断指定属性是否为空字符串<br>
-示例：</p>
-<pre><code class="lang-cs">q = q.Where(e =&gt; !string.IsNullOrEmpty(e.Name));
-</code></pre><p><br></p>
-<p>方法名：Contains<br>
-所属类型：System.Linq.Enumerable<br>
-备注：判断指定属性的值是否在指定的列表中<br>
-示例：</p>
-<pre><code class="lang-cs">int[] values = new int[] { 1, 2 };
-q = q.Where(e =&gt; values.Contains(e.Id));
-</code></pre><p><br></p>
-<p>方法名：Contains<br>
-所属类型：System.Collections.Generic.List<t><br>
-备注：判断指定属性的值是否在指定的列表中<br>
-示例：<p>
-<pre><code class="lang-cs">List&lt;int&gt; values = new List&lt;int&gt; { 1, 2 };
-q = q.Where(e =&gt; values.Contains(e.Id));
-</code></pre><p><br></p>
-<p>方法名：Any<br>
-所属类型：Rafy.Domain.EntityList<br>
-备注：用于判断某个实体的聚合子实体中是否存在一个实体满足某个条件，在使用前，需要使用 Cast<t> 方法把非泛型的 EntityList 转换为具体实体的集合类型 IEnumerable<t><br>
-示例：<p>
-<pre><code class="lang-cs">q = q.Where(book =&gt; book.ChapterList.Cast&lt;Chapter&gt;().Any(c =&gt; c.Name == chapterName));
-q = q.Where(book =&gt; book.ChapterList.Concrete().Any(c =&gt; c.SectionList.Cast&lt;Section&gt;().Any(s =&gt; s.Name.Contains(sectionName))));
-</code></pre><p><br></p>
-<p>方法名：All<br>
-所属类型：Rafy.Domain.EntityList<br>
-备注：用于判断某个实体的聚合子实体中是否所有实体满足某个条件，在使用前，需要使用 Cast<t> 方法把非泛型的 EntityList 转换为具体实体的集合类型 IEnumerable<t><br>
-示例：<p>
-<pre><code class="lang-cs">q = q.Where(book =&gt; book.ChapterList.Cast&lt;Chapter&gt;().All(c =&gt; c.Name == chapterName));
-</code></pre><p><br></p>
-<h2 id="代码生成">代码生成</h2>
-<p>框架为常用的 Linq 查询提供了代码段生成，使用
-即可生成相应代码段：</p>
-<pre><code class="lang-cs">[RepositoryQuery]
-public virtual $EntityListName$ $MethodName$($Parameters$)
-{
-    var q = this.CreateLinqQuery();
-    q = q.Where(e =&gt; e.$WhereExpression$);$end$
-    return ($EntityListName$)this.QueryData(q);
-}
-</code></pre><p>详见：
-<a href="\articles\Content\领域实体框架\其它\代码段.html">代码段</a>
-。</p>
-</t></t></t></t></t></article>
+<div id="sidetoggle">
+  <div>
+    <div class="sidefilter">
+      <form class="toc-filter">
+        <span class="glyphicon glyphicon-filter filter-icon"></span>
+        <input type="text" id="toc_filter_input" placeholder="Enter here to filter..." onkeypress="if(event.keyCode==13) {return false;}">
+      </form>
+    </div>
+    <div class="sidetoc">
+      <div class="toc" id="toc">
+          
+          <ul class="nav level1">
+            <li>
+              <span class="expand-stub"></span>
+              <a href="articles/ intro.md" name="" title="Raft&#26694;&#26550;">Raft&#26694;&#26550;</a>
+                
+                <ul class="nav level2">
+                  <li>
+                    <span class="expand-stub"></span>
+                    <a href="articles/ s1.md" name="" title="&#39046;&#22495;&#23454;&#20307;&#26550;&#26500;">&#39046;&#22495;&#23454;&#20307;&#26550;&#26500;</a>
+                      
+                      <ul class="nav level3">
+                        <li>
+                          <a href="articles/ &#23433;&#35013;.md" name="" title="articles/&#23433;&#35013;">articles/&#23433;&#35013;</a>
+                        </li>
+                        <li>
+                          <span class="expand-stub"></span>
+                          <a href="articles/ &#24555;&#36895;&#35797;&#29992;.md" name="" title="&#24555;&#36895;&#35797;&#29992;">&#24555;&#36895;&#35797;&#29992;</a>
+                            
+                            <ul class="nav level4">
+                              <li>
+                                <a href="articles/ &#21019;&#24314;&#31532;&#19968;&#20010;&#31243;&#24207;.md" name="" title="&#21019;&#24314;&#31532;&#19968;&#20010;&#31243;&#24207;">&#21019;&#24314;&#31532;&#19968;&#20010;&#31243;&#24207;</a>
+                              </li>
+                              <li>
+                                <a href="articles/ &#24555;&#36895;&#35797;&#29992;\&#22914;&#20309;&#65306;&#36830;&#25509;&#21040; Sql Server &#25968;&#25454;&#24211;.md" name="" title="&#36830;&#25509;&#21040; Sql Server &#25968;&#25454;&#24211;">&#36830;&#25509;&#21040; Sql Server &#25968;&#25454;&#24211;</a>
+                              </li>
+                            </ul>  </li>
+                        <li>
+                          <span class="expand-stub"></span>
+                          <a href="articles/ Content.md" name="" title="&#39046;&#22495;&#23454;&#20307;">&#39046;&#22495;&#23454;&#20307;</a>
+                            
+                            <ul class="nav level4">
+                              <li>
+                                <a href="articles/ &#23454;&#20307;&#30340;&#29366;&#24577;.md" name="" title="&#23454;&#20307;&#30340;&#29366;&#24577;">&#23454;&#20307;&#30340;&#29366;&#24577;</a>
+                              </li>
+                              <li>
+                                <a href="articles/ &#23454;&#20307;&#20851;&#31995;.md" name="" title="&#23454;&#20307;&#20851;&#31995;">&#23454;&#20307;&#20851;&#31995;</a>
+                              </li>
+                              <li>
+                                <span class="expand-stub"></span>
+                                <a href="articles/ &#23454;&#20307;&#23646;&#24615;.md" name="" title="&#23454;&#20307;&#23646;&#24615;">&#23454;&#20307;&#23646;&#24615;</a>
+                                  
+                                  <ul class="nav level5">
+                                    <li>
+                                      <a href="articles/ &#19968;&#33324;&#23646;&#24615;.md" name="" title="&#19968;&#33324;&#23646;&#24615;">&#19968;&#33324;&#23646;&#24615;</a>
+                                    </li>
+                                    <li>
+                                      <a href="articles/ &#24341;&#29992;&#23646;&#24615;.md" name="" title="&#24341;&#29992;&#23646;&#24615;">&#24341;&#29992;&#23646;&#24615;</a>
+                                    </li>
+                                    <li>
+                                      <a href="articles/ &#32452;&#21512;&#23376;&#23646;&#24615;.md" name="" title="&#32452;&#21512;&#23376;&#23646;&#24615;">&#32452;&#21512;&#23376;&#23646;&#24615;</a>
+                                    </li>
+                                    <li>
+                                      <a href="articles/ &#20887;&#20313;&#23646;&#24615;.md" name="" title="&#20887;&#20313;&#23646;&#24615;">&#20887;&#20313;&#23646;&#24615;</a>
+                                    </li>
+                                    <li>
+                                      <a href="articles/ &#22823;&#25968;&#25454;&#23646;&#24615;.md" name="" title="&#22823;&#25968;&#25454;&#23646;&#24615;">&#22823;&#25968;&#25454;&#23646;&#24615;</a>
+                                    </li>
+                                    <li>
+                                      <a href="articles/ &#21482;&#35835;&#23646;&#24615;.md" name="" title="&#21482;&#35835;&#23646;&#24615;">&#21482;&#35835;&#23646;&#24615;</a>
+                                    </li>
+                                  </ul>  </li>
+                              <li>
+                                <a href="articles/ &#39046;&#22495;&#23454;&#20307;&#20851;&#31995;&#22270;.md" name="" title="&#39046;&#22495;&#23454;&#20307;&#20851;&#31995;&#22270;">&#39046;&#22495;&#23454;&#20307;&#20851;&#31995;&#22270;</a>
+                              </li>
+                              <li>
+                                <a href="articles/ &#26641;&#22411;&#23454;&#20307;.md" name="" title="&#26641;&#22411;&#23454;&#20307;">&#26641;&#22411;&#23454;&#20307;</a>
+                              </li>
+                            </ul>  </li>
+                        <li>
+                          <span class="expand-stub"></span>
+                          <a href="articles/ &#23454;&#20307;&#20179;&#24211;.md" name="" title="&#23454;&#20307;&#20179;&#24211;">&#23454;&#20307;&#20179;&#24211;</a>
+                            
+                            <ul class="nav level4">
+                              <li>
+                                <a href="articles/ &#23454;&#20307;&#30340;&#21019;&#24314;&#12289;&#21024;&#38500;&#12289;&#20462;&#25913;.md" name="" title="&#23454;&#20307;&#30340;&#21019;&#24314;&#12289;&#21024;&#38500;&#12289;&#20462;&#25913;">&#23454;&#20307;&#30340;&#21019;&#24314;&#12289;&#21024;&#38500;&#12289;&#20462;&#25913;</a>
+                              </li>
+                              <li>
+                                <span class="expand-stub"></span>
+                                <a href="articles/ &#32534;&#20889;&#26597;&#35810;.md" name="" title="&#32534;&#20889;&#26597;&#35810;">&#32534;&#20889;&#26597;&#35810;</a>
+                                  
+                                  <ul class="nav level5">
+                                    <li>
+                                      <a href="articles/ Linq &#26597;&#35810;.md" name="" title="Linq &#26597;&#35810;">Linq &#26597;&#35810;</a>
+                                    </li>
+                                    <li>
+                                      <a href="articles/ SqlTree &#26597;&#35810;.md" name="" title="SqlTree &#26597;&#35810;">SqlTree &#26597;&#35810;</a>
+                                    </li>
+                                    <li>
+                                      <a href="articles/ &#36890;&#29992;&#26597;&#35810;&#26465;&#20214;(CommonQueryCriteria).md" name="" title="&#36890;&#29992;&#26597;&#35810;&#26465;&#20214;&#65288;CommonQueryCriteria&#65289;">&#36890;&#29992;&#26597;&#35810;&#26465;&#20214;&#65288;CommonQueryCriteria&#65289;</a>
+                                    </li>
+                                    <li>
+                                      <a href="articles/ Sql &#26597;&#35810;.md" name="" title="Sql &#26597;&#35810;">Sql &#26597;&#35810;</a>
+                                    </li>
+                                    <li>
+                                      <a href="articles/ &#20998;&#39029;&#26597;&#35810;.md" name="" title="&#20998;&#39029;&#26597;&#35810;">&#20998;&#39029;&#26597;&#35810;</a>
+                                    </li>
+                                    <li>
+                                      <a href="articles/ &#36138;&#23146;&#21152;&#36733;.md" name="" title="&#36138;&#23146;&#21152;&#36733;">&#36138;&#23146;&#21152;&#36733;</a>
+                                    </li>
+                                    <li>
+                                      <a href="articles/ &#25968;&#25454;&#34892;&#25968;&#26597;&#35810;.md" name="" title="&#25968;&#25454;&#34892;&#25968;&#26597;&#35810;">&#25968;&#25454;&#34892;&#25968;&#26597;&#35810;</a>
+                                    </li>
+                                    <li>
+                                      <a href="articles/ &#34920;&#26684;&#26597;&#35810;.md" name="" title="&#34920;&#26684;&#26597;&#35810;">&#34920;&#26684;&#26597;&#35810;</a>
+                                    </li>
+                                  </ul>  </li>
+                              <li>
+                                <a href="articles/ &#22823;&#25209;&#37327;&#23548;&#20837;&#23454;&#20307;.md" name="" title="&#22823;&#25209;&#37327;&#23548;&#20837;&#23454;&#20307;">&#22823;&#25209;&#37327;&#23548;&#20837;&#23454;&#20307;</a>
+                              </li>
+                              <li>
+                                <a href="articles/ &#20179;&#24211;&#25968;&#25454;&#23618;&#65288;RepositoryDataProvider&#65289;.md" name="" title="&#21019;&#24314;&#25968;&#25454;&#23618;&#65288;RepositoryDataProvider&#65289;">&#21019;&#24314;&#25968;&#25454;&#23618;&#65288;RepositoryDataProvider&#65289;</a>
+                              </li>
+                            </ul>  </li>
+                        <li>
+                          <span class="expand-stub"></span>
+                          <a href="articles/ &#39046;&#22495;&#36923;&#36753;.md" name="" title="&#39046;&#22495;&#36923;&#36753;">&#39046;&#22495;&#36923;&#36753;</a>
+                            
+                            <ul class="nav level4">
+                              <li>
+                                <a href="articles/ &#39046;&#22495;&#25511;&#21046;&#22120;.md" name="" title="&#39046;&#22495;&#25511;&#21046;&#22120;">&#39046;&#22495;&#25511;&#21046;&#22120;</a>
+                              </li>
+                              <li>
+                                <a href="articles/ &#21333;&#36830;&#25509;&#20107;&#21153;.md" name="" title="&#21333;&#36830;&#25509;&#20107;&#21153;">&#21333;&#36830;&#25509;&#20107;&#21153;</a>
+                              </li>
+                              <li>
+                                <a href="articles/ &#25191;&#34892;SQL&#25110;&#23384;&#20648;&#36807;&#31243;.md" name="" title="&#25191;&#34892;SQL&#25110;&#23384;&#20648;&#36807;&#31243;">&#25191;&#34892;SQL&#25110;&#23384;&#20648;&#36807;&#31243;</a>
+                              </li>
+                              <li>
+                                <a href="articles/ &#39046;&#22495;&#26381;&#21153;.md" name="" title="&#39046;&#22495;&#26381;&#21153;">&#39046;&#22495;&#26381;&#21153;</a>
+                              </li>
+                            </ul>  </li>
+                        <li>
+                          <span class="expand-stub"></span>
+                          <a href="articles/ &#23545;&#35937;&#20851;&#31995;&#26144;&#23556;.md" name="" title="&#23545;&#35937;&#20851;&#31995;&#26144;&#23556;">&#23545;&#35937;&#20851;&#31995;&#26144;&#23556;</a>
+                            
+                            <ul class="nav level4">
+                              <li>
+                                <a href="articles/ &#37197;&#32622;&#26144;&#23556;.md" name="" title="&#37197;&#32622;&#26144;&#23556;">&#37197;&#32622;&#26144;&#23556;</a>
+                              </li>
+                              <li>
+                                <a href="articles/ &#32487;&#25215;&#26144;&#23556;.md" name="" title="&#32487;&#25215;&#26144;&#23556;">&#32487;&#25215;&#26144;&#23556;</a>
+                              </li>
+                              <li>
+                                <a href="articles/ SQL &#35821;&#21477;&#26085;&#24535;.md" name="" title="SQL &#35821;&#21477;&#26085;&#24535;">SQL &#35821;&#21477;&#26085;&#24535;</a>
+                              </li>
+                              <li>
+                                <a href="articles/ &#25968;&#25454;&#24211;&#21516;&#27493;&#21151;&#33021;.md" name="" title="&#25968;&#25454;&#24211;&#21516;&#27493;&#21151;&#33021;">&#25968;&#25454;&#24211;&#21516;&#27493;&#21151;&#33021;</a>
+                              </li>
+                              <li>
+                                <a href="articles/ &#20026;&#25968;&#25454;&#24211;&#29983;&#25104;&#27880;&#37322;.md" name="" title="&#20026;&#25968;&#25454;&#24211;&#29983;&#25104;&#27880;&#37322;">&#20026;&#25968;&#25454;&#24211;&#29983;&#25104;&#27880;&#37322;</a>
+                              </li>
+                              <li>
+                                <a href="articles/ &#22810;&#25968;&#25454;&#24211;&#25903;&#25345;.md" name="" title="&#22810;&#25968;&#25454;&#24211;&#25903;&#25345;">&#22810;&#25968;&#25454;&#24211;&#25903;&#25345;</a>
+                              </li>
+                            </ul>  </li>
+                        <li>
+                          <span class="expand-stub"></span>
+                          <a href="articles/ &#37096;&#32626;.md" name="" title="&#37096;&#32626;">&#37096;&#32626;</a>
+                            
+                            <ul class="nav level4">
+                              <li>
+                                <a href="articles/ &#20998;&#24067;&#24335;&#37096;&#32626;.md" name="" title="&#20998;&#24067;&#24335;&#37096;&#32626;">&#20998;&#24067;&#24335;&#37096;&#32626;</a>
+                              </li>
+                            </ul>  </li>
+                        <li>
+                          <span class="expand-stub"></span>
+                          <a href="articles/ &#25554;&#20214;&#32423;&#25193;&#23637;.md" name="" title="&#25554;&#20214;&#32423;&#25193;&#23637;">&#25554;&#20214;&#32423;&#25193;&#23637;</a>
+                            
+                            <ul class="nav level4">
+                              <li>
+                                <a href="articles/ &#23454;&#20307;&#23646;&#24615;&#25193;&#23637;.md" name="" title="&#23454;&#20307;&#23646;&#24615;&#25193;&#23637;">&#23454;&#20307;&#23646;&#24615;&#25193;&#23637;</a>
+                              </li>
+                              <li>
+                                <a href="articles/ &#23454;&#20307;&#37197;&#32622;&#25193;&#23637;.md" name="" title="&#23454;&#20307;&#37197;&#32622;&#25193;&#23637;">&#23454;&#20307;&#37197;&#32622;&#25193;&#23637;</a>
+                              </li>
+                              <li>
+                                <a href="articles/ &#23454;&#20307;&#26597;&#35810;&#25193;&#23637;&#65288;&#20179;&#24211;&#25193;&#23637;&#65289;.md" name="" title="&#23454;&#20307;&#26597;&#35810;&#25193;&#23637;&#65288;&#20179;&#24211;&#25193;&#23637;&#65289;">&#23454;&#20307;&#26597;&#35810;&#25193;&#23637;&#65288;&#20179;&#24211;&#25193;&#23637;&#65289;</a>
+                              </li>
+                              <li>
+                                <a href="articles/ &#23454;&#20307;&#20445;&#23384;&#36923;&#36753;&#25193;&#23637;&#65288;&#20179;&#24211;&#25968;&#25454;&#23618;&#65289;.md" name="" title="&#23454;&#20307;&#20445;&#23384;&#36923;&#36753;&#25193;&#23637;&#65288;&#20179;&#24211;&#25968;&#25454;&#23618;&#65289;">&#23454;&#20307;&#20445;&#23384;&#36923;&#36753;&#25193;&#23637;&#65288;&#20179;&#24211;&#25968;&#25454;&#23618;&#65289;</a>
+                              </li>
+                              <li>
+                                <a href="articles/ &#39046;&#22495;&#36923;&#36753;&#25193;&#23637;&#65288;&#39046;&#22495;&#25511;&#21046;&#22120;&#65289;.md" name="" title="&#39046;&#22495;&#36923;&#36753;&#25193;&#23637;&#65288;&#39046;&#22495;&#25511;&#21046;&#22120;&#65289;">&#39046;&#22495;&#36923;&#36753;&#25193;&#23637;&#65288;&#39046;&#22495;&#25511;&#21046;&#22120;&#65289;</a>
+                              </li>
+                            </ul>  </li>
+                        <li>
+                          <span class="expand-stub"></span>
+                          <a href="articles/ &#20854;&#23427;.md" name="" title="&#20854;&#23427;">&#20854;&#23427;</a>
+                            
+                            <ul class="nav level4">
+                              <li>
+                                <a href="articles/ &#20195;&#30721;&#27573;.md" name="" title="&#20195;&#30721;&#27573;">&#20195;&#30721;&#27573;</a>
+                              </li>
+                              <li>
+                                <a href="articles/ Rafy &#19982;&#32463;&#20856; DDD &#30340;&#20851;&#31995;.md" name="" title="Rafy &#19982;&#32463;&#20856; DDD &#30340;&#20851;&#31995;">Rafy &#19982;&#32463;&#20856; DDD &#30340;&#20851;&#31995;</a>
+                              </li>
+                              <li>
+                                <a href="articles/ &#24120;&#35265;&#38382;&#39064;.md" name="" title="&#24120;&#35265;&#38382;&#39064;&#65288;FQA&#65289;">&#24120;&#35265;&#38382;&#39064;&#65288;FQA&#65289;</a>
+                              </li>
+                            </ul>  </li>
+                      </ul>  </li>
+                  <li>
+                    <span class="expand-stub"></span>
+                    <a href="articles/ &#35774;&#35745;&#29702;&#24565;.md" name="" title="&#35774;&#35745;&#29702;&#24565;">&#35774;&#35745;&#29702;&#24565;</a>
+                      
+                      <ul class="nav level3">
+                        <li>
+                          <a href="articles/ &#39046;&#22495;&#39537;&#21160;&#35774;&#35745;.md" name="" title="&#39046;&#22495;&#39537;&#21160;&#35774;&#35745;">&#39046;&#22495;&#39537;&#21160;&#35774;&#35745;</a>
+                        </li>
+                        <li>
+                          <a href="articles/ &#38754;&#21521;&#26381;&#21153;&#26550;&#26500;.md" name="" title="&#38754;&#21521;&#26381;&#21153;&#26550;&#26500;">&#38754;&#21521;&#26381;&#21153;&#26550;&#26500;</a>
+                        </li>
+                        <li>
+                          <a href="articles/ &#25554;&#20214;&#21270;&#26550;&#26500;.md" name="" title="&#25554;&#20214;&#21270;&#26550;&#26500;">&#25554;&#20214;&#21270;&#26550;&#26500;</a>
+                        </li>
+                        <li>
+                          <a href="articles/ &#27169;&#22411;&#39537;&#21160;&#26550;&#26500;.md" name="" title="&#27169;&#22411;&#39537;&#21160;&#26550;&#26500;">&#27169;&#22411;&#39537;&#21160;&#26550;&#26500;</a>
+                        </li>
+                        <li>
+                          <a href="articles/ &#20135;&#21697;&#32447;&#24037;&#31243;.md" name="" title="&#20135;&#21697;&#32447;&#24037;&#31243;">&#20135;&#21697;&#32447;&#24037;&#31243;</a>
+                        </li>
+                      </ul>  </li>
+                  <li>
+                    <span class="expand-stub"></span>
+                    <a href="articles/ &#24555;&#36895;&#30028;&#38754;&#29983;&#25104;.md" name="" title="&#24555;&#36895;&#30028;&#38754;&#29983;&#25104;">&#24555;&#36895;&#30028;&#38754;&#29983;&#25104;</a>
+                      
+                      <ul class="nav level3">
+                        <li>
+                          <a href="articles/ WPF &#30028;&#38754;.md" name="" title="WPF &#30028;&#38754;">WPF &#30028;&#38754;</a>
+                        </li>
+                        <li>
+                          <a href="articles/ Web &#30028;&#38754;.md" name="" title="Web &#30028;&#38754;">Web &#30028;&#38754;</a>
+                        </li>
+                      </ul>  </li>
+                  <li>
+                    <span class="expand-stub"></span>
+                    <a href="articles/ &#29616;&#26377;&#25554;&#20214;.md" name="" title="&#29616;&#26377;&#25554;&#20214;">&#29616;&#26377;&#25554;&#20214;</a>
+                      
+                      <ul class="nav level3">
+                        <li>
+                          <a href="articles/ &#24189;&#28789;&#25554;&#20214;.md" name="" title="&#24189;&#28789;&#25554;&#20214;">&#24189;&#28789;&#25554;&#20214;</a>
+                        </li>
+                        <li>
+                          <a href="articles/ &#27969;&#27700;&#21495;&#25554;&#20214;.md" name="" title="&#27969;&#27700;&#21495;&#25554;&#20214;">&#27969;&#27700;&#21495;&#25554;&#20214;</a>
+                        </li>
+                        <li>
+                          <a href="articles/ &#26102;&#38388;&#25139;&#25554;&#20214;.md" name="" title="&#26102;&#38388;&#25139;&#25554;&#20214;">&#26102;&#38388;&#25139;&#25554;&#20214;</a>
+                        </li>
+                        <li>
+                          <a href="articles/ &#24080;&#25143;&#25554;&#20214;.md" name="" title="&#24080;&#25143;&#25554;&#20214;">&#24080;&#25143;&#25554;&#20214;</a>
+                        </li>
+                        <li>
+                          <a href="articles/ RBAC &#25554;&#20214;.md" name="" title="RBAC &#25554;&#20214;">RBAC &#25554;&#20214;</a>
+                        </li>
+                        <li>
+                          <a href="articles/ &#22810;&#22269;&#35821;&#35328;&#25554;&#20214;.md" name="" title="&#22810;&#22269;&#35821;&#35328;&#25554;&#20214;">&#22810;&#22269;&#35821;&#35328;&#25554;&#20214;</a>
+                        </li>
+                        <li>
+                          <a href="articles/ &#38468;&#20214;&#25554;&#20214;.md" name="" title="&#38468;&#20214;&#25554;&#20214;">&#38468;&#20214;&#25554;&#20214;</a>
+                        </li>
+                        <li>
+                          <a href="articles/ &#22823;&#25209;&#37327;&#23548;&#20837;&#23454;&#20307;&#25554;&#20214;.md" name="" title="&#22823;&#25209;&#37327;&#23548;&#20837;&#23454;&#20307;&#25554;&#20214;">&#22823;&#25209;&#37327;&#23548;&#20837;&#23454;&#20307;&#25554;&#20214;</a>
+                        </li>
+                        <li>
+                          <a href="articles/ &#25991;&#20214;&#23384;&#20648;&#25554;&#20214;.md" name="" title="&#25991;&#20214;&#23384;&#20648;&#25554;&#20214;">&#25991;&#20214;&#23384;&#20648;&#25554;&#20214;</a>
+                        </li>
+                      </ul>  </li>
+                </ul>  </li>
+          </ul>      </div>
+    </div>
+  </div>
+</div></article>
           </div>
           
           <div class="hidden-sm col-md-2" role="complementary">
@@ -242,8 +372,8 @@ public virtual $EntityListName$ $MethodName$($Parameters$)
       </footer>
     </div>
     
-    <script type="text/javascript" src="../styles/docfx.vendor.js"></script>
-    <script type="text/javascript" src="../styles/docfx.js"></script>
-    <script type="text/javascript" src="../styles/main.js"></script>
+    <script type="text/javascript" src="../Test/styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../Test/styles/docfx.js"></script>
+    <script type="text/javascript" src="../Test/styles/main.js"></script>
   </body>
 </html>
